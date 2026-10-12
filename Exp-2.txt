@@ -1,0 +1,69 @@
+ import ipywidgets as widgets
+from IPython.display import display
+
+slider = widgets.IntSlider(value=50, min=0, max=100, step=1, description='Value:')
+output = widgets.Output()
+
+def on_value_change(change):
+  output.clear_output()
+  print(f'Slider value is {change["new"]}')
+
+slider.observe(on_value_change, names='value')
+display(slider, output)
+
+import pandas as pd
+import requests
+import sqlite3
+
+
+print("\n--- Reading from CSV ---")
+df_csv = pd.read_csv("/content/sample_data/mnist_test.csv")
+print("Data from CSV (df_csv.head()):")
+display(df_csv.head())
+
+
+print("\n--- Reading from HTML Table ---")
+url = "https://en.wikipedia.org/wiki/List_of_countries_by_GDP_(nominal)"
+headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'}
+response = requests.get(url, headers=headers)
+tables = pd.read_html(response.text)
+df_web = tables[0]
+print("Data from HTML Table (df_web.head()):")
+display(df_web.head())
+
+
+print("\n--- Creating and Saving Excel File ---")
+data_excel = {'Name': ['Alice', 'Bob', 'Charlie'],
+              'Age': [25, 30, 35],
+              'City': ['New York', 'Los Angeles', 'Chicago']}
+df_to_excel = pd.DataFrame(data_excel)
+excel_file_path = '/content/sample_data.xlsx'
+df_to_excel.to_excel(excel_file_path, index=False)
+print(f"Excel file created at: {excel_file_path}")
+
+
+print("\n--- Reading from Excel File ---")
+df_excel_read = pd.read_excel(excel_file_path)
+print("Data from Excel (df_excel_read.head()):")
+display(df_excel_read.head())
+
+
+print("\n--- Reading from SQL Database ---")
+conn = sqlite3.connect(':memory:')
+cursor = conn.cursor()
+cursor.execute('''
+    CREATE TABLE employees (
+        id INTEGER PRIMARY KEY,
+        name TEXT,
+        department TEXT,
+        salary INTEGER
+    )
+''')
+cursor.execute("INSERT INTO employees (name, department, salary) VALUES ('John Doe', 'Sales', 50000)")
+cursor.execute("INSERT INTO employees (name, department, salary) VALUES ('Jane Smith', 'Marketing', 60000)")
+cursor.execute("INSERT INTO employees (name, department, salary) VALUES ('Peter Jones', 'Engineering', 75000)")
+conn.commit()
+df_sql = pd.read_sql_query("SELECT * FROM employees", conn)
+print("Data from SQL Database (df_sql.head()):")
+display(df_sql.head())
+conn.close()

@@ -1,0 +1,27 @@
+import pandas as pd
+
+df = pd.read_csv('/content/original_dataset.csv')
+
+print(df.head())
+print(df.tail())
+print(df.info())
+print(df.describe())
+print(df.columns)
+
+categorical_cols = ['gender', 'marital_status', 'education_level',
+                    'employment_status', 'loan_purpose', 'grade_subgrade']
+
+for col in categorical_cols:
+    unique_vals = df[col].unique()
+    print(f"\nUnique values in '{col}': {unique_vals}")
+
+cols = ['annual_income', 'monthly_income', 'loan_amount']
+
+for col in cols:
+    print(f"\nStatistics for '{col}':")
+    print(f"Mean: {df[col].mean():.2f}")
+    print(f"Median: {df[col].median():.2f}")
+    print(f"Mode: {df[col].mode().values}")
+    print(f"Range: {df[col].max() - df[col].min():.2f}")
+    print(f"Variance: {df[col].var():.2f}")
+    print(f"Standard Deviation: {df[col].std():.2f}")
